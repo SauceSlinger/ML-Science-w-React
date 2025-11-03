@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Science Explorer - Interactive Machine Learning Guide</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // ML Modules Content Data
+        const mlModulesContent = [
+            // Supervised Learning
+            {
+                id: 1,
+                category: "Supervised",
+                title: "Vineyard Yield Predictor",
+                description: "A wine estate in Napa Valley uses linear regression to forecast annual grape harvest based on rainfall, temperature, and soil pH levels.",
+                useCases: ["Predicting tons of grapes per acre", "Optimizing irrigation schedules", "Planning production capacity"],
+                keyPoints: [
+                    "Simple and interpretable model",
+                    "Works well with continuous variables",
+                    "Weather data most influential factor"
+                ],
+                icon: "🍇"
+            },
+            {
+                id: 2,
+                category: "Supervised",
+                title: "Dragon Egg Hatching Classifier",
+                description: "In a fantasy realm, dragon breeders use logistic regression to predict if an egg will hatch based on incubation temperature and magical aura readings.",
+                useCases: ["Determining viable eggs (hatch/no-hatch)", "Optimizing incubation conditions", "Resource allocation for care"],
+                keyPoints: [
+                    "Binary outcome prediction",
+                    "Probability-based decisions",
+                    "Temperature threshold at 1,200°F critical"
+                ],
+                icon: "🐉"
+            },
+            {
+                id: 3,
+                category: "Supervised",
+                title: "Streaming Content Recommender",
+                description: "A major streaming platform uses decision trees to determine which genres to recommend based on viewing history, time of day, and device type.",
+                useCases: ["Genre selection for users", "Personalized homepage layouts", "Weekend vs weekday content"],
+                keyPoints: [
+                    "Easy to explain to stakeholders",
+                    "Handles categorical features well",
+                    "Visualizable decision paths"
+                ],
+                icon: "📺"
+            },
+            {
+                id: 4,
+                category: "Supervised",
+                title: "Insurance Fraud Detector",
+                description: "An insurance company deploys random forest to identify fraudulent claims by analyzing claim patterns, policy history, and timing anomalies.",
+                useCases: ["Flagging suspicious claims for investigation", "Prioritizing auditor workload", "Reducing false positives"],
+                keyPoints: [
+                    "Ensemble reduces false alarms",
+                    "Handles imbalanced datasets",
+                    "Identifies top fraud indicators"
+                ],
+                icon: "🔐"
+            },
+            {
+                id: 5,
+                category: "Supervised",
+                title: "Asteroid Composition Analyzer",
+                description: "NASA uses SVM to classify asteroid types (metallic, rocky, icy) from spectral signature data captured by space telescopes.",
+                useCases: ["Mining target identification", "Collision risk assessment", "Scientific research prioritization"],
+                keyPoints: [
+                    "Handles high-dimensional spectral data",
+                    "Works with limited training samples",
+                    "Kernel trick for non-linear boundaries"
+                ],
+                icon: "☄️"
+            },
+            {
+                id: 6,
+                category: "Supervised",
+                title: "Medical Image Diagnosis System",
+                description: "A hospital network employs neural networks to detect early-stage tumors in X-rays and MRI scans with radiologist-level accuracy.",
+                useCases: ["Cancer screening automation", "Reducing diagnostic wait times", "Second-opinion validation"],
+                keyPoints: [
+                    "Learns complex visual patterns",
+                    "Trained on millions of images",
+                    "GPU-accelerated processing"
+                ],
+                icon: "🏥"
+            },
+            
+            // Unsupervised Learning
+            {
+                id: 7,
+                category: "Unsupervised",
+                title: "Retail Customer Segmentation",
+                description: "A global retailer uses K-Means to group shoppers into personas (budget buyers, luxury seekers, impulse shoppers) based on purchase behavior.",
+                useCases: ["Targeted marketing campaigns", "Store layout optimization", "Inventory planning by segment"],
+                keyPoints: [
+                    "Discovered 5 distinct customer types",
+                    "Updated quarterly for seasonality",
+                    "Drives 23% increase in conversion"
+                ],
+                icon: "🛍️"
+            },
+            {
+                id: 8,
+                category: "Unsupervised",
+                title: "Evolutionary Tree Constructor",
+                description: "Biologists use hierarchical clustering to build phylogenetic trees showing evolutionary relationships between species based on DNA sequences.",
+                useCases: ["Species classification", "Tracing evolutionary pathways", "Identifying common ancestors"],
+                keyPoints: [
+                    "Creates natural hierarchy",
+                    "No preset cluster count needed",
+                    "Dendrogram shows relationships"
+                ],
+                icon: "🧬"
+            },
+            {
+                id: 9,
+                category: "Unsupervised",
+                title: "AI Art Style Compressor",
+                description: "A digital art platform uses PCA to reduce thousands of style attributes into 10 principal components for efficient similarity matching.",
+                useCases: ["Fast style-based search", "Artwork recommendation", "Trend analysis visualization"],
+                keyPoints: [
+                    "Reduces 2,048 features to 10",
+                    "Retains 95% of style variance",
+                    "Enables real-time comparisons"
+                ],
+                icon: "🎨"
+            },
+            {
+                id: 10,
+                category: "Unsupervised",
+                title: "Urban Crime Hotspot Mapper",
+                description: "City police use DBSCAN to identify crime clusters and patrol zones from incident GPS coordinates, ignoring isolated events.",
+                useCases: ["Patrol route optimization", "Resource deployment planning", "Crime prevention strategies"],
+                keyPoints: [
+                    "Finds irregular-shaped hotspots",
+                    "Filters random incidents as noise",
+                    "Adapts to city geography"
+                ],
+                icon: "🚔"
+            },
+            {
+                id: 11,
+                category: "Unsupervised",
+                title: "Quantum Data Denoiser",
+                description: "In a sci-fi research lab, autoencoders clean quantum sensor readings by learning to reconstruct signals while filtering measurement noise.",
+                useCases: ["Signal purification", "Anomaly detection in experiments", "Data compression for transmission"],
+                keyPoints: [
+                    "Learns normal signal patterns",
+                    "Unsupervised noise removal",
+                    "Compresses to 15% original size"
+                ],
+                icon: "⚛️"
+            },
+            
+            // Reinforcement Learning
+            {
+                id: 12,
+                category: "RL",
+                title: "Warehouse Robot Navigator",
+                description: "An e-commerce fulfillment center trains robots with Q-Learning to find optimal paths through dynamic warehouse layouts.",
+                useCases: ["Fastest picking routes", "Collision avoidance", "Adapting to layout changes"],
+                keyPoints: [
+                    "Learns from trial and error",
+                    "Handles moving obstacles",
+                    "Reduced picking time by 40%"
+                ],
+                icon: "🤖"
+            },
+            {
+                id: 13,
+                category: "RL",
+                title: "Virtual Racing Champion",
+                description: "A game studio uses DQN to create unbeatable AI opponents that learn racing lines and overtaking strategies from millions of gameplay sessions.",
+                useCases: ["Adaptive difficulty scaling", "Player training mode", "Tournament-level AI"],
+                keyPoints: [
+                    "Masters complex 3D environments",
+                    "Learns from visual input only",
+                    "Beats 98% of human players"
+                ],
+                icon: "🏎️"
+            },
+            {
+                id: 14,
+                category: "RL",
+                title: "Renewable Energy Grid Optimizer",
+                description: "A smart grid uses Policy Gradient to balance solar/wind power distribution, learning to minimize costs while meeting real-time demand.",
+                useCases: ["Peak load management", "Battery storage optimization", "Carbon footprint reduction"],
+                keyPoints: [
+                    "Continuous action space (0-100% allocation)",
+                    "Adapts to weather patterns",
+                    "Saves $2M annually in costs"
+                ],
+                icon: "⚡"
+            },
+            {
+                id: 15,
+                category: "RL",
+                title: "Space Station Arm Controller",
+                description: "ISS robotic arms use Actor-Critic to perform delicate satellite repairs, learning precise movements in zero-gravity microgravity conditions.",
+                useCases: ["Satellite capture and repair", "Cargo module docking", "External maintenance tasks"],
+                keyPoints: [
+                    "Sub-millimeter precision required",
+                    "Stable learning in simulations",
+                    "Transferred to real hardware"
+                ],
+                icon: "🛰️"
+            },
+            {
+                id: 16,
+                category: "RL",
+                title: "Clinical Trial Dose Finder",
+                description: "Pharmaceutical researchers use Multi-Armed Bandit to dynamically adjust drug dosages across patient groups, maximizing efficacy while minimizing side effects.",
+                useCases: ["Adaptive dosing protocols", "Patient safety optimization", "Accelerated trial completion"],
+                keyPoints: [
+                    "Balances exploration vs exploitation",
+                    "Ethical early stopping criteria",
+                    "Reduced trial time by 6 months"
+                ],
+                icon: "💊"
+            }
+        ];
+
+        // Main App Component
+        function MLRulesViewer() {
+            const [selectedCategory, setSelectedCategory] = useState('All');
+            const [searchTerm, setSearchTerm] = useState('');
+            const [expandedCard, setExpandedCard] = useState(null);
+
+            const categories = ['All', 'Supervised', 'Unsupervised', 'RL'];
+
+            const getCategoryColor = (category) => {
+                switch (category) {
+                    case 'Supervised':
+                        return {
+                            bg: 'bg-blue-100',
+                            border: 'border-blue-500',
+                            text: 'text-blue-700',
+                            badge: 'bg-blue-500',
+                            hover: 'hover:bg-blue-50'
+                        };
+                    case 'Unsupervised':
+                        return {
+                            bg: 'bg-green-100',
+                            border: 'border-green-500',
+                            text: 'text-green-700',
+                            badge: 'bg-green-500',
+                            hover: 'hover:bg-green-50'
+                        };
+                    case 'RL':
+                        return {
+                            bg: 'bg-purple-100',
+                            border: 'border-purple-500',
+                            text: 'text-purple-700',
+                            badge: 'bg-purple-500',
+                            hover: 'hover:bg-purple-50'
+                        };
+                    default:
+                        return {
+                            bg: 'bg-gray-100',
+                            border: 'border-gray-500',
+                            text: 'text-gray-700',
+                            badge: 'bg-gray-500',
+                            hover: 'hover:bg-gray-50'
+                        };
+                }
+            };
+
+            const filteredModules = mlModulesContent.filter(module => {
+                const matchesCategory = selectedCategory === 'All' || module.category === selectedCategory;
+                const matchesSearch = module.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    module.description.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            const getCategoryStats = () => {
+                const supervised = mlModulesContent.filter(m => m.category === 'Supervised').length;
+                const unsupervised = mlModulesContent.filter(m => m.category === 'Unsupervised').length;
+                const rl = mlModulesContent.filter(m => m.category === 'RL').length;
+                return { supervised, unsupervised, rl };
+            };
+
+            const stats = getCategoryStats();
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <header className="gradient-bg text-white shadow-lg">
+                        <div className="container mx-auto px-4 py-8 sm:py-12">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-3">
+                                🤖 ML Science Explorer
+                            </h1>
+                            <p className="text-center text-sm sm:text-base md:text-lg opacity-90 max-w-2xl mx-auto">
+                                Your interactive guide to Machine Learning algorithms and applications
+                            </p>
+                            
+                            {/* Stats Bar */}
+                            <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-4 max-w-2xl mx-auto">
+                                <div className="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                                    <div className="text-xl sm:text-2xl font-bold">{stats.supervised}</div>
+                                    <div className="text-xs sm:text-sm opacity-90">Supervised</div>
+                                </div>
+                                <div className="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                                    <div className="text-xl sm:text-2xl font-bold">{stats.unsupervised}</div>
+                                    <div className="text-xs sm:text-sm opacity-90">Unsupervised</div>
+                                </div>
+                                <div className="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                                    <div className="text-xl sm:text-2xl font-bold">{stats.rl}</div>
+                                    <div className="text-xs sm:text-sm opacity-90">Reinforcement</div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Controls */}
+                    <div className="sticky top-0 bg-white shadow-md z-10">
+                        <div className="container mx-auto px-4 py-4">
+                            {/* Search Bar */}
+                            <div className="mb-4">
+                                <input
+                                    type="text"
+                                    placeholder="🔍 Search algorithms..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition-colors text-sm sm:text-base"
+                                />
+                            </div>
+
+                            {/* Category Filters */}
+                            <div className="flex flex-wrap gap-2">
+                                {categories.map(category => {
+                                    const colors = getCategoryColor(category === 'All' ? 'default' : category);
+                                    const isActive = selectedCategory === category;
+                                    return (
+                                        <button
+                                            key={category}
+                                            onClick={() => setSelectedCategory(category)}
+                                            className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all ${
+                                                isActive
+                                                    ? `${colors.badge} text-white shadow-md`
+                                                    : `${colors.bg} ${colors.text} ${colors.hover}`
+                                            }`}
+                                        >
+                                            {category}
+                                            {category !== 'All' && (
+                                                <span className="ml-2 opacity-75">
+                                                    ({category === 'Supervised' ? stats.supervised : 
+                                                      category === 'Unsupervised' ? stats.unsupervised : 
+                                                      stats.rl})
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Content Grid */}
+                    <main className="container mx-auto px-4 py-8">
+                        {filteredModules.length === 0 ? (
+                            <div className="text-center py-12">
+                                <div className="text-6xl mb-4">🔍</div>
+                                <h3 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-2">
+                                    No algorithms found
+                                </h3>
+                                <p className="text-gray-500">
+                                    Try adjusting your search or filter criteria
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                                {filteredModules.map((module, index) => {
+                                    const colors = getCategoryColor(module.category);
+                                    const isExpanded = expandedCard === module.id;
+                                    
+                                    return (
+                                        <div
+                                            key={module.id}
+                                            className={`bg-white rounded-xl shadow-md border-l-4 ${colors.border} card-hover fade-in overflow-hidden`}
+                                            style={{ animationDelay: `${index * 0.05}s` }}
+                                        >
+                                            {/* Card Header */}
+                                            <div className={`${colors.bg} p-4`}>
+                                                <div className="flex items-start justify-between">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <span className="text-3xl">{module.icon}</span>
+                                                            <span className={`${colors.badge} text-white text-xs font-bold px-2 py-1 rounded`}>
+                                                                {module.category}
+                                                            </span>
+                                                        </div>
+                                                        <h3 className={`text-lg sm:text-xl font-bold ${colors.text}`}>
+                                                            {module.title}
+                                                        </h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Card Body */}
+                                            <div className="p-4">
+                                                <p className="text-gray-700 text-sm sm:text-base mb-4">
+                                                    {module.description}
+                                                </p>
+
+                                                {/* Key Points */}
+                                                <div className="mb-4">
+                                                    <h4 className="font-semibold text-gray-900 mb-2 text-sm">
+                                                        ✨ Key Points:
+                                                    </h4>
+                                                    <ul className="space-y-1">
+                                                        {module.keyPoints.map((point, idx) => (
+                                                            <li key={idx} className="text-xs sm:text-sm text-gray-600 flex items-start">
+                                                                <span className={`${colors.text} mr-2`}>•</span>
+                                                                {point}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+
+                                                {/* Use Cases - Expandable */}
+                                                <div>
+                                                    <button
+                                                        onClick={() => setExpandedCard(isExpanded ? null : module.id)}
+                                                        className={`w-full text-left font-semibold text-sm ${colors.text} flex items-center justify-between mb-2 ${colors.hover} p-2 rounded transition-colors`}
+                                                    >
+                                                        <span>💡 Use Cases</span>
+                                                        <span className="text-lg">{isExpanded ? '−' : '+'}</span>
+                                                    </button>
+                                                    
+                                                    {isExpanded && (
+                                                        <ul className="space-y-1 pl-2 fade-in">
+                                                            {module.useCases.map((useCase, idx) => (
+                                                                <li key={idx} className="text-xs sm:text-sm text-gray-600 flex items-start">
+                                                                    <span className={`${colors.text} mr-2`}>→</span>
+                                                                    {useCase}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-gray-800 text-white mt-12 py-8">
+                        <div className="container mx-auto px-4 text-center">
+                            <p className="text-sm sm:text-base mb-2">
+                                🚀 ML Science Explorer - Interactive Machine Learning Guide
+                            </p>
+                            <p className="text-xs sm:text-sm opacity-75">
+                                Explore {mlModulesContent.length} machine learning algorithms across 3 categories
+                            </p>
+                            <p className="text-xs mt-4 opacity-50">
+                                Built with assistance from Gemini and GitHub Copilot optimizing data science education
+                            </p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        // Render the app using React 18 API
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MLRulesViewer />);
+    </script>
+</body>
+</html>
