@@ -466,7 +466,7 @@
                                                     </button>
                                                     
                                                     {isExpanded && (
-                                                        <ul className="space-y-1 pl-2 animate-fadeIn">
+                                                        <ul className="space-y-1 pl-2 fade-in">
                                                             {module.useCases.map((useCase, idx) => (
                                                                 <li key={idx} className="text-xs sm:text-sm text-gray-600 flex items-start">
                                                                     <span className={`${colors.text} mr-2`}>→</span>
@@ -502,8 +502,9 @@
             );
         }
 
-        // Render the app
-        ReactDOM.render(<MLRulesViewer />, document.getElementById('root'));
+        // Render the app using React 18 API
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MLRulesViewer />);
     </script>
 </body>
 </html>
