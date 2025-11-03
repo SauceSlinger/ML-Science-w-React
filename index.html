@@ -721,7 +721,8 @@
             charts, 
             keyPoints, 
             useCases,
-            onBack 
+            onBack,
+            exampleId
         }) {
             const [selectedTab, setSelectedTab] = React.useState('overview');
             const [dataPageSize, setDataPageSize] = React.useState(20);
@@ -942,7 +943,7 @@
                 let specificInsights = [];
                 
                 // Generate example-specific insights based on the data patterns
-                switch (example.id) {
+                switch (exampleId) {
                     case 1: // Vineyard
                         specificInsights = [
                             React.createElement('p', {
@@ -2115,7 +2116,8 @@
                 charts: charts,
                 keyPoints: example.keyPoints,
                 useCases: example.useCases,
-                onBack: onBack
+                onBack: onBack,
+                exampleId: example.id
             });
         }
 
