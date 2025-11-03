@@ -610,55 +610,6 @@
                 className: 'w-full h-full'
             }));
         }
-            React.useEffect(() => {
-                const canvas = document.getElementById(canvasId);
-                if (!canvas) return;
-                
-                const ctx = canvas.getContext('2d');
-                
-                if (window[`chart_${canvasId}`]) {
-                    window[`chart_${canvasId}`].destroy();
-                }
-                
-                const labels = data.map(item => item[labelField]);
-                const values = data.map(item => item[valueField]);
-                const colors = chartUtils.generateColorPalette(data.length);
-                
-                window[`chart_${canvasId}`] = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels,
-                        datasets: [{
-                            data: values,
-                            backgroundColor: colors.map(color => chartUtils.addAlpha(color, 0.7)),
-                            borderColor: colors,
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: title,
-                                font: { size: 16, weight: 'bold' }
-                            },
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
-            }, [data, labelField, valueField, title, canvasId]);
-            
-            return React.createElement('div', { 
-                className: 'relative h-80 w-full'
-            }, React.createElement('canvas', { 
-                id: canvasId,
-                className: 'w-full h-full'
-            }));
-        }
 
         // ===== ML EXAMPLE PAGE TEMPLATE =====
         function MLExamplePage({ 
