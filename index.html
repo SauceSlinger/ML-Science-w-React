@@ -650,6 +650,118 @@
             return data;
         };
 
+        const generateArtCompressorData = (samples = 500) => {
+            const data = [];
+            
+            // Art style categories for realistic dataset
+            const artStyles = [
+                'Renaissance', 'Baroque', 'Impressionist', 'Abstract', 'Cubist', 
+                'Surrealist', 'Pop Art', 'Minimalist', 'Expressionist', 'Contemporary'
+            ];
+            
+            const artists = [
+                'Da Vinci', 'Picasso', 'Van Gogh', 'Monet', 'Dalí', 
+                'Warhol', 'Pollock', 'Kandinsky', 'Matisse', 'Rothko'
+            ];
+            
+            const mediums = ['Oil', 'Acrylic', 'Watercolor', 'Digital', 'Mixed Media'];
+            
+            for (let i = 0; i < samples; i++) {
+                const artStyle = artStyles[Math.floor(Math.random() * artStyles.length)];
+                const artist = artists[Math.floor(Math.random() * artists.length)];
+                const medium = mediums[Math.floor(Math.random() * mediums.length)];
+                
+                // Generate 2048 original features (simulating CNN features from artwork analysis)
+                const originalFeatures = Array.from({ length: 2048 }, () => 
+                    Math.random() * 2 - 1 // Values between -1 and 1
+                );
+                
+                // Simulate PCA compression to 10 principal components
+                // Each PC captures different style aspects with decreasing variance
+                const pc1 = originalFeatures.slice(0, 200).reduce((sum, val) => sum + val, 0) / 200 + 
+                           (artStyle === 'Renaissance' ? 0.8 : artStyle === 'Abstract' ? -0.7 : Math.random() * 0.4 - 0.2);
+                           
+                const pc2 = originalFeatures.slice(200, 400).reduce((sum, val) => sum + val, 0) / 200 + 
+                           (artStyle === 'Impressionist' ? 0.9 : artStyle === 'Cubist' ? -0.8 : Math.random() * 0.3 - 0.15);
+                           
+                const pc3 = originalFeatures.slice(400, 600).reduce((sum, val) => sum + val, 0) / 200 + 
+                           (medium === 'Digital' ? 0.6 : medium === 'Oil' ? -0.5 : Math.random() * 0.3 - 0.15);
+                           
+                const pc4 = originalFeatures.slice(600, 800).reduce((sum, val) => sum + val, 0) / 200 + 
+                           (artStyle === 'Pop Art' ? 0.7 : artStyle === 'Minimalist' ? -0.6 : Math.random() * 0.25 - 0.125);
+                           
+                const pc5 = originalFeatures.slice(800, 1000).reduce((sum, val) => sum + val, 0) / 200 + 
+                           Math.random() * 0.4 - 0.2;
+                           
+                const pc6 = originalFeatures.slice(1000, 1200).reduce((sum, val) => sum + val, 0) / 200 + 
+                           Math.random() * 0.3 - 0.15;
+                           
+                const pc7 = originalFeatures.slice(1200, 1400).reduce((sum, val) => sum + val, 0) / 200 + 
+                           Math.random() * 0.25 - 0.125;
+                           
+                const pc8 = originalFeatures.slice(1400, 1600).reduce((sum, val) => sum + val, 0) / 200 + 
+                           Math.random() * 0.2 - 0.1;
+                           
+                const pc9 = originalFeatures.slice(1600, 1800).reduce((sum, val) => sum + val, 0) / 200 + 
+                           Math.random() * 0.15 - 0.075;
+                           
+                const pc10 = originalFeatures.slice(1800, 2000).reduce((sum, val) => sum + val, 0) / 200 + 
+                            Math.random() * 0.1 - 0.05;
+                
+                // Calculate explained variance for each PC (decreasing)
+                const explainedVariance = [
+                    32.4, 18.7, 12.3, 8.9, 6.2, 4.8, 3.7, 2.9, 2.4, 1.9
+                ];
+                
+                // Cumulative variance explained
+                const cumulativeVariance = explainedVariance.reduce((acc, curr, idx) => {
+                    acc.push((acc[idx - 1] || 0) + curr);
+                    return acc;
+                }, []);
+                
+                // Reconstruction error (lower for well-represented styles)
+                const reconstructionError = Math.max(0.02, 
+                    0.15 - (cumulativeVariance[9] / 100) + Math.random() * 0.08
+                );
+                
+                // Similarity score for style matching (0-1)
+                const similarityScore = Math.max(0.1, 
+                    0.95 - reconstructionError * 2 + Math.random() * 0.1
+                );
+                
+                // Search efficiency improvement
+                const searchSpeedUp = Math.round(2048 / 10 * (0.8 + Math.random() * 0.4));
+                
+                data.push({
+                    artworkId: `ART-${String(i + 1).padStart(4, '0')}`,
+                    artStyle,
+                    artist,
+                    medium,
+                    originalDimensions: 2048,
+                    compressedDimensions: 10,
+                    pc1: Math.round(pc1 * 1000) / 1000,
+                    pc2: Math.round(pc2 * 1000) / 1000,
+                    pc3: Math.round(pc3 * 1000) / 1000,
+                    pc4: Math.round(pc4 * 1000) / 1000,
+                    pc5: Math.round(pc5 * 1000) / 1000,
+                    pc6: Math.round(pc6 * 1000) / 1000,
+                    pc7: Math.round(pc7 * 1000) / 1000,
+                    pc8: Math.round(pc8 * 1000) / 1000,
+                    pc9: Math.round(pc9 * 1000) / 1000,
+                    pc10: Math.round(pc10 * 1000) / 1000,
+                    explainedVarianceRatio: explainedVariance,
+                    cumulativeVariance: Math.round(cumulativeVariance[9] * 10) / 10,
+                    reconstructionError: Math.round(reconstructionError * 1000) / 1000,
+                    similarityScore: Math.round(similarityScore * 1000) / 1000,
+                    searchSpeedUp,
+                    compressionRatio: Math.round((1 - 10/2048) * 1000) / 10, // 99.5%
+                    storageReduction: Math.round((2048 - 10) / 2048 * 100 * 10) / 10
+                });
+            }
+            
+            return data;
+        };
+
         const dataGenerators = {
             vineyard: generateVineyardData,
             dragonEgg: generateDragonEggData,
@@ -661,7 +773,8 @@
             evolutionary: generateEvolutionaryData,
             warehouse: generateWarehouseData,
             racingAI: generateRacingAIData,
-            energyGrid: generateEnergyGridData
+            energyGrid: generateEnergyGridData,
+            artCompressor: generateArtCompressorData
         };
 
         // ===== CHART COMPONENTS =====
@@ -1307,6 +1420,60 @@
                                 '🎯 ',
                                 React.createElement('strong', { key: 'bold5' }, 'Breeding Program Optimization'),
                                 ': This logistic regression model helps dragonkeepers maximize hatch rates from 45% (random conditions) to over 85% (optimized conditions). The model guides decisions on chamber temperature settings, magical aura enhancement, optimal timing, and parent dragon selection for breeding programs.'
+                            ])
+                        ];
+                        break;
+                        
+                    case 9: // AI Art Style Compressor
+                        specificInsights = [
+                            React.createElement('p', {
+                                key: 'p1',
+                                className: 'mb-4'
+                            }, 'The AI Art Style Compressor demonstrates the power of Principal Component Analysis (PCA) for dimensionality reduction in high-dimensional feature spaces. By compressing 2,048 CNN-extracted art features into just 10 principal components, it retains 94.2% of the original style information while enabling lightning-fast similarity searches and style-based recommendations.'),
+                            
+                            React.createElement('p', {
+                                key: 'p2',
+                                className: 'mb-4'
+                            }, [
+                                '🎨 ',
+                                React.createElement('strong', { key: 'bold1' }, 'Principal Component Interpretation'),
+                                ': The first two principal components reveal intuitive art style clusters. PC1 (32.4% variance) separates classical styles like Renaissance and Baroque from modern movements like Abstract and Contemporary. PC2 (18.7% variance) distinguishes realistic techniques from abstract approaches. This separation enables automatic style classification with remarkable accuracy.'
+                            ]),
+                            
+                            React.createElement('p', {
+                                key: 'p3',
+                                className: 'mb-4'
+                            }, [
+                                '📊 ',
+                                React.createElement('strong', { key: 'bold2' }, 'Variance Explained Optimization'),
+                                ': The elbow in the variance curve at PC3 demonstrates optimal dimensionality choice. While the first 3 components capture 63.4% of variance, adding 7 more components reaches 94.2% - a sweet spot where reconstruction quality remains high while achieving massive compression. This 99.5% size reduction enables real-time gallery searches across millions of artworks.'
+                            ]),
+                            
+                            React.createElement('p', {
+                                key: 'p4',
+                                className: 'mb-4'
+                            }, [
+                                '🔍 ',
+                                React.createElement('strong', { key: 'bold3' }, 'Search Performance Revolution'),
+                                ': The compression efficiency analysis shows remarkable results - similarity scores remain above 85% for most artworks while reducing search time by 200x. Traditional feature matching in 2,048-dimensional space requires expensive distance calculations, while the 10-dimensional PCA space enables instant similarity queries. This transforms user experience from slow, database-style searches to instant, visual discovery.'
+                            ]),
+                            
+                            React.createElement('p', {
+                                key: 'p5',
+                                className: 'mb-4'
+                            }, [
+                                '🎯 ',
+                                React.createElement('strong', { key: 'bold4' }, 'Medium and Style Separation'),
+                                ': PC3 beautifully separates traditional mediums (oil, watercolor) from digital art, indicating that artistic medium creates distinct feature patterns. This separation enables advanced filtering - users can search for "Impressionist-style digital art" or "Oil paintings with Abstract characteristics". The PCA space naturally organizes art by both stylistic and technical attributes.'
+                            ]),
+                            
+                            React.createElement('p', {
+                                key: 'p6',
+                                className: 'mb-4'
+                            }, [
+                                '🚀 ',
+                                React.createElement('strong', { key: 'bold5' }, 'Real-World Impact'),
+                                ': This PCA-based compression powers major art platforms, enabling features like "find similar artworks," "style-based recommendations," and "visual search." Museums use this technology for collection analysis, discovering stylistic influences and grouping works by technique. Art marketplaces leverage it for price prediction models, where style similarity indicates comparable market values.'
                             ])
                         ];
                         break;
@@ -2402,6 +2569,135 @@
                                         valueField: 'count',
                                         title: 'Species Categories',
                                         canvasId: 'evolution-pie-1'
+                                    })
+                                }
+                            ];
+                            break;
+
+                        case 9: // AI Art Style Compressor
+                            generatedData = dataGenerators.artCompressor(500);
+                            generatedCharts = [
+                                {
+                                    title: "Principal Component Analysis - Style Dimensions",
+                                    component: React.createElement(ScatterPlot, {
+                                        data: generatedData,
+                                        xField: 'pc1',
+                                        yField: 'pc2',
+                                        colorField: 'artStyle',
+                                        title: 'PC1 vs PC2 - Art Style Clusters',
+                                        xLabel: 'Principal Component 1 (Classical vs Modern)',
+                                        yLabel: 'Principal Component 2 (Realistic vs Abstract)',
+                                        canvasId: 'art-scatter-1'
+                                    })
+                                },
+                                {
+                                    title: "Medium Classification in PC Space",
+                                    component: React.createElement(ScatterPlot, {
+                                        data: generatedData,
+                                        xField: 'pc2',
+                                        yField: 'pc3',
+                                        colorField: 'medium',
+                                        title: 'PC2 vs PC3 - Medium Separation',
+                                        xLabel: 'Principal Component 2 (Realistic vs Abstract)',
+                                        yLabel: 'Principal Component 3 (Traditional vs Digital)',
+                                        canvasId: 'art-scatter-2'
+                                    })
+                                },
+                                {
+                                    title: "Variance Explained by Principal Components",
+                                    component: React.createElement(BarChart, {
+                                        data: [
+                                            { component: 'PC1', variance: 32.4 },
+                                            { component: 'PC2', variance: 18.7 },
+                                            { component: 'PC3', variance: 12.3 },
+                                            { component: 'PC4', variance: 8.9 },
+                                            { component: 'PC5', variance: 6.2 },
+                                            { component: 'PC6', variance: 4.8 },
+                                            { component: 'PC7', variance: 3.7 },
+                                            { component: 'PC8', variance: 2.9 },
+                                            { component: 'PC9', variance: 2.4 },
+                                            { component: 'PC10', variance: 1.9 }
+                                        ],
+                                        xField: 'component',
+                                        yField: 'variance',
+                                        title: 'Explained Variance by Component (%)',
+                                        xLabel: 'Principal Component',
+                                        yLabel: 'Variance Explained (%)',
+                                        canvasId: 'art-bar-1',
+                                        color: chartUtils.colors.purple
+                                    })
+                                },
+                                {
+                                    title: "Cumulative Variance Explained",
+                                    component: React.createElement(LineChart, {
+                                        data: [
+                                            { component: 1, cumulative: 32.4 },
+                                            { component: 2, cumulative: 51.1 },
+                                            { component: 3, cumulative: 63.4 },
+                                            { component: 4, cumulative: 72.3 },
+                                            { component: 5, cumulative: 78.5 },
+                                            { component: 6, cumulative: 83.3 },
+                                            { component: 7, cumulative: 87.0 },
+                                            { component: 8, cumulative: 89.9 },
+                                            { component: 9, cumulative: 92.3 },
+                                            { component: 10, cumulative: 94.2 }
+                                        ],
+                                        xField: 'component',
+                                        yField: 'cumulative',
+                                        title: 'Cumulative Variance Explained (%)',
+                                        xLabel: 'Number of Components',
+                                        yLabel: 'Cumulative Variance (%)',
+                                        canvasId: 'art-line-1',
+                                        color: chartUtils.colors.success
+                                    })
+                                },
+                                {
+                                    title: "Art Style Distribution in Dataset",
+                                    component: React.createElement(PieChart, {
+                                        data: Object.entries(generatedData.reduce((acc, artwork) => {
+                                            acc[artwork.artStyle] = (acc[artwork.artStyle] || 0) + 1;
+                                            return acc;
+                                        }, {})).map(([style, count]) => ({ style, count })),
+                                        labelField: 'style',
+                                        valueField: 'count',
+                                        title: 'Artwork Styles in Collection',
+                                        canvasId: 'art-pie-1'
+                                    })
+                                },
+                                {
+                                    title: "Compression Efficiency Analysis",
+                                    component: React.createElement(ScatterPlot, {
+                                        data: generatedData.map(artwork => ({
+                                            ...artwork,
+                                            compressionEfficiency: artwork.similarityScore * 100,
+                                            errorRate: artwork.reconstructionError * 100
+                                        })),
+                                        xField: 'compressionEfficiency',
+                                        yField: 'errorRate',
+                                        colorField: 'artStyle',
+                                        title: 'Compression Quality vs Reconstruction Error',
+                                        xLabel: 'Similarity Score (%)',
+                                        yLabel: 'Reconstruction Error (%)',
+                                        canvasId: 'art-scatter-3'
+                                    })
+                                },
+                                {
+                                    title: "Search Performance Improvement",
+                                    component: React.createElement(BarChart, {
+                                        data: (() => {
+                                            const avgSpeedUp = generatedData.reduce((acc, curr) => acc + curr.searchSpeedUp, 0) / generatedData.length;
+                                            return [
+                                                { method: 'Original Features\n(2048 dims)', searchTime: 100, efficiency: 'Baseline' },
+                                                { method: 'PCA Compressed\n(10 dims)', searchTime: Math.round(100 / avgSpeedUp * 10) / 10, efficiency: 'Optimized' }
+                                            ];
+                                        })(),
+                                        xField: 'method',
+                                        yField: 'searchTime',
+                                        title: 'Search Time Comparison (Relative %)',
+                                        xLabel: 'Feature Space Method',
+                                        yLabel: 'Relative Search Time (%)',
+                                        canvasId: 'art-bar-2',
+                                        color: chartUtils.colors.danger
                                     })
                                 }
                             ];
