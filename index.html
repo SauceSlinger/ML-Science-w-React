@@ -762,6 +762,147 @@
             return data;
         };
 
+        const generateQuantumDenoisingData = (samples = 800) => {
+            const data = [];
+            
+            // Quantum measurement types and their characteristics
+            const measurementTypes = [
+                'Spin-Up', 'Spin-Down', 'Entangled Pair', 'Superposition', 'Coherent State'
+            ];
+            
+            const noiseTypes = [
+                'Thermal', 'Shot', 'Phase', 'Amplitude', 'Environmental'
+            ];
+            
+            const detectorTypes = ['SQUID', 'Single-Photon', 'Ion Trap', 'NV Center', 'Josephson Junction'];
+            
+            for (let i = 0; i < samples; i++) {
+                const measurementType = measurementTypes[Math.floor(Math.random() * measurementTypes.length)];
+                const noiseType = noiseTypes[Math.floor(Math.random() * noiseTypes.length)];
+                const detectorType = detectorTypes[Math.floor(Math.random() * detectorTypes.length)];
+                
+                // Generate quantum signal components using GMM principles
+                // Component 1: Pure quantum signal (highest probability, low noise)
+                const signalStrength = measurementType === 'Entangled Pair' ? 0.85 + Math.random() * 0.1 :
+                                     measurementType === 'Coherent State' ? 0.75 + Math.random() * 0.15 :
+                                     measurementType === 'Superposition' ? 0.65 + Math.random() * 0.2 :
+                                     0.5 + Math.random() * 0.3;
+                
+                // Component 2: Noise-corrupted signal (medium probability, higher variance)
+                const noiseLevel = noiseType === 'Thermal' ? 0.15 + Math.random() * 0.25 :
+                                  noiseType === 'Shot' ? 0.1 + Math.random() * 0.2 :
+                                  noiseType === 'Phase' ? 0.2 + Math.random() * 0.3 :
+                                  noiseType === 'Environmental' ? 0.25 + Math.random() * 0.35 :
+                                  0.05 + Math.random() * 0.15; // Amplitude noise
+                
+                // Component 3: Pure noise (lowest probability, highest variance)
+                const pureNoise = Math.random() * 0.4;
+                
+                // GMM component weights (probabilities)
+                const componentWeights = {
+                    signal: 0.6 + Math.random() * 0.25,  // 60-85% signal
+                    corruptedSignal: 0.15 + Math.random() * 0.2,  // 15-35% corrupted
+                    noise: 0.05 + Math.random() * 0.15   // 5-20% pure noise
+                };
+                
+                // Normalize weights
+                const totalWeight = componentWeights.signal + componentWeights.corruptedSignal + componentWeights.noise;
+                componentWeights.signal /= totalWeight;
+                componentWeights.corruptedSignal /= totalWeight;
+                componentWeights.noise /= totalWeight;
+                
+                // GMM component assignment (which component this measurement belongs to)
+                const rand = Math.random();
+                let assignedComponent;
+                if (rand < componentWeights.signal) {
+                    assignedComponent = 'Pure Signal';
+                } else if (rand < componentWeights.signal + componentWeights.corruptedSignal) {
+                    assignedComponent = 'Corrupted Signal';
+                } else {
+                    assignedComponent = 'Noise';
+                }
+                
+                // Generate quantum measurement features
+                // Amplitude and phase measurements (complex quantum states)
+                const amplitude = assignedComponent === 'Pure Signal' ? signalStrength + Math.random() * 0.05 :
+                                 assignedComponent === 'Corrupted Signal' ? signalStrength * (1 - noiseLevel) + Math.random() * noiseLevel :
+                                 pureNoise + Math.random() * 0.1;
+                
+                const phase = assignedComponent === 'Pure Signal' ? (Math.PI / 4) + Math.random() * 0.1 - 0.05 :
+                             assignedComponent === 'Corrupted Signal' ? (Math.PI / 4) + Math.random() * 0.4 - 0.2 :
+                             Math.random() * 2 * Math.PI; // Random phase for noise
+                
+                // Coherence time (quantum decoherence)
+                const coherenceTime = assignedComponent === 'Pure Signal' ? 10 + Math.random() * 5 :
+                                     assignedComponent === 'Corrupted Signal' ? 5 + Math.random() * 3 :
+                                     0.5 + Math.random() * 2;
+                
+                // Fidelity (quantum state purity)
+                const fidelity = assignedComponent === 'Pure Signal' ? 0.95 + Math.random() * 0.04 :
+                                assignedComponent === 'Corrupted Signal' ? 0.7 + Math.random() * 0.2 :
+                                0.3 + Math.random() * 0.3;
+                
+                // Signal-to-noise ratio
+                const snr = assignedComponent === 'Pure Signal' ? 25 + Math.random() * 10 :
+                           assignedComponent === 'Corrupted Signal' ? 8 + Math.random() * 8 :
+                           -5 + Math.random() * 5;
+                
+                // GMM log-likelihood for this measurement
+                const logLikelihood = assignedComponent === 'Pure Signal' ? -2 + Math.random() * 1 :
+                                     assignedComponent === 'Corrupted Signal' ? -8 + Math.random() * 3 :
+                                     -15 + Math.random() * 5;
+                
+                // Temperature and environmental factors
+                const temperature = 0.01 + Math.random() * 0.05; // Kelvin (near absolute zero)
+                const magneticField = 0.1 + Math.random() * 2.0; // Tesla
+                
+                // Detector efficiency
+                const detectorEfficiency = detectorType === 'SQUID' ? 0.95 + Math.random() * 0.04 :
+                                          detectorType === 'Single-Photon' ? 0.85 + Math.random() * 0.1 :
+                                          detectorType === 'NV Center' ? 0.75 + Math.random() * 0.15 :
+                                          0.7 + Math.random() * 0.2;
+                
+                // Clustering metrics for GMM performance
+                const clusterProbability = assignedComponent === 'Pure Signal' ? componentWeights.signal :
+                                          assignedComponent === 'Corrupted Signal' ? componentWeights.corruptedSignal :
+                                          componentWeights.noise;
+                
+                // Denoising quality metrics
+                const denoisingQuality = assignedComponent === 'Pure Signal' ? 0.98 + Math.random() * 0.02 :
+                                        assignedComponent === 'Corrupted Signal' ? 0.85 + Math.random() * 0.1 :
+                                        0.4 + Math.random() * 0.3;
+                
+                const reconstructionError = assignedComponent === 'Pure Signal' ? Math.random() * 0.02 :
+                                           assignedComponent === 'Corrupted Signal' ? 0.05 + Math.random() * 0.1 :
+                                           0.2 + Math.random() * 0.3;
+                
+                data.push({
+                    measurementId: `QM-${String(i + 1).padStart(4, '0')}`,
+                    measurementType,
+                    noiseType,
+                    detectorType,
+                    assignedComponent,
+                    amplitude: Math.round(amplitude * 1000) / 1000,
+                    phase: Math.round(phase * 1000) / 1000,
+                    coherenceTime: Math.round(coherenceTime * 100) / 100,
+                    fidelity: Math.round(fidelity * 1000) / 1000,
+                    snr: Math.round(snr * 10) / 10,
+                    logLikelihood: Math.round(logLikelihood * 100) / 100,
+                    temperature: Math.round(temperature * 1000) / 1000,
+                    magneticField: Math.round(magneticField * 100) / 100,
+                    detectorEfficiency: Math.round(detectorEfficiency * 1000) / 1000,
+                    clusterProbability: Math.round(clusterProbability * 1000) / 1000,
+                    denoisingQuality: Math.round(denoisingQuality * 1000) / 1000,
+                    reconstructionError: Math.round(reconstructionError * 1000) / 1000,
+                    componentWeights,
+                    signalStrength: Math.round(signalStrength * 1000) / 1000,
+                    noiseLevel: Math.round(noiseLevel * 1000) / 1000
+                });
+            }
+            
+            return data;
+        };
+
         const dataGenerators = {
             vineyard: generateVineyardData,
             dragonEgg: generateDragonEggData,
@@ -774,7 +915,8 @@
             warehouse: generateWarehouseData,
             racingAI: generateRacingAIData,
             energyGrid: generateEnergyGridData,
-            artCompressor: generateArtCompressorData
+            artCompressor: generateArtCompressorData,
+            quantumDenoiser: generateQuantumDenoisingData
         };
 
         // ===== CHART COMPONENTS =====
@@ -1478,6 +1620,69 @@
                         ];
                         break;
                         
+                    case 11: // Quantum Data Denoiser
+                        specificInsights = [
+                            React.createElement('p', {
+                                key: 'p1',
+                                className: 'mb-4'
+                            }, 'The Quantum Data Denoiser demonstrates Gaussian Mixture Models (GMM) for unsupervised signal separation in quantum sensor data. By automatically identifying three distinct components - pure quantum signals, noise-corrupted signals, and environmental noise - it achieves exceptional denoising without requiring labeled training data.'),
+                            
+                            React.createElement('p', {
+                                key: 'p2',
+                                className: 'mb-4'
+                            }, [
+                                '⚛️ ',
+                                React.createElement('strong', { key: 'bold1' }, 'Quantum Phase Space Clustering'),
+                                ': The amplitude-phase scatter plot reveals how GMM naturally separates quantum measurements into distinct regions. Pure quantum signals cluster tightly around specific phase values with high amplitude, while noise creates diffuse clouds. The three-component mixture captures the quantum nature where coherent states maintain phase relationships, corrupted signals show phase drift, and pure noise exhibits random phase distribution.'
+                            ]),
+                            
+                            React.createElement('p', {
+                                key: 'p3',
+                                className: 'mb-4'
+                            }, [
+                                '📊 ',
+                                React.createElement('strong', { key: 'bold2' }, 'Automatic Component Discovery'),
+                                ': The GMM component distribution shows the model automatically discovered that 60-65% of measurements contain recoverable quantum signals, 20-25% are noise-corrupted but salvageable, and 10-15% are pure noise to be discarded. This unsupervised discovery is crucial in quantum experiments where the noise characteristics are unknown and constantly changing.'
+                            ]),
+                            
+                            React.createElement('p', {
+                                key: 'p4',
+                                className: 'mb-4'
+                            }, [
+                                '🎯 ',
+                                React.createElement('strong', { key: 'bold3' }, 'Fidelity-SNR Correlation'),
+                                ': The fidelity vs signal-to-noise ratio analysis demonstrates how GMM separates quantum states by quality. High-fidelity measurements (>0.9) cluster with high SNR values, indicating pure quantum states. The middle cluster represents partially decoherent states that can be recovered, while low-fidelity, low-SNR points identify measurements corrupted beyond repair.'
+                            ]),
+                            
+                            React.createElement('p', {
+                                key: 'p5',
+                                className: 'mb-4'
+                            }, [
+                                '🌡️ ',
+                                React.createElement('strong', { key: 'bold4' }, 'Environmental Decoherence Patterns'),
+                                ': The temperature-coherence analysis reveals how GMM identifies environmental effects on quantum measurements. Pure signals maintain long coherence times even at higher temperatures, corrupted signals show temperature-dependent decoherence, and noise measurements have minimal coherence regardless of conditions. This separation enables environmental compensation strategies.'
+                            ]),
+                            
+                            React.createElement('p', {
+                                key: 'p6',
+                                className: 'mb-4'
+                            }, [
+                                '📈 ',
+                                React.createElement('strong', { key: 'bold5' }, 'Log-Likelihood Quality Assessment'),
+                                ': The log-likelihood distribution provides a confidence measure for each classification. High likelihood values (-5 to 0) indicate measurements that fit the pure signal model perfectly, while very low values (< -15) represent clear outliers. This probabilistic framework enables adaptive thresholding based on experimental requirements.'
+                            ]),
+                            
+                            React.createElement('p', {
+                                key: 'p7',
+                                className: 'mb-4'
+                            }, [
+                                '🔬 ',
+                                React.createElement('strong', { key: 'bold6' }, 'Real-World Quantum Applications'),
+                                ': This GMM approach revolutionizes quantum computing error correction, quantum cryptography key validation, and quantum sensor calibration. Unlike traditional filtering that removes all high-frequency components, GMM preserves quantum coherence while eliminating only true noise, enabling quantum devices to operate in noisy environments with 95%+ fidelity retention.'
+                            ])
+                        ];
+                        break;
+                        
                     case 13: // Virtual Racing Champion
                         specificInsights = [
                             React.createElement('p', {
@@ -1863,13 +2068,13 @@
                 id: 11,
                 category: "Unsupervised",
                 title: "Quantum Data Denoiser",
-                description: "In a sci-fi research lab, autoencoders clean quantum sensor readings by learning to reconstruct signals while filtering measurement noise.",
-                algorithm: "Autoencoder",
-                useCases: ["Signal purification", "Anomaly detection in experiments", "Data compression for transmission"],
+                description: "A quantum research lab uses Gaussian Mixture Models to separate pure quantum signals from thermal noise and environmental interference in sensor measurements.",
+                algorithm: "Gaussian Mixture Model",
+                useCases: ["Quantum signal purification", "Noise component identification", "Measurement quality assessment"],
                 keyPoints: [
-                    "Learns normal signal patterns",
-                    "Unsupervised noise removal",
-                    "Compresses to 15% original size"
+                    "Separates 3 signal components automatically",
+                    "Identifies pure vs corrupted quantum states",
+                    "Achieves 95%+ denoising accuracy"
                 ],
                 icon: "⚛️"
             },
@@ -2698,6 +2903,141 @@
                                         yLabel: 'Relative Search Time (%)',
                                         canvasId: 'art-bar-2',
                                         color: chartUtils.colors.danger
+                                    })
+                                }
+                            ];
+                            break;
+
+                        case 11: // Quantum Data Denoiser
+                            generatedData = dataGenerators.quantumDenoiser(800);
+                            generatedCharts = [
+                                {
+                                    title: "GMM Component Separation - Amplitude vs Phase",
+                                    component: React.createElement(ScatterPlot, {
+                                        data: generatedData,
+                                        xField: 'amplitude',
+                                        yField: 'phase',
+                                        colorField: 'assignedComponent',
+                                        title: 'Quantum Signal Components in Phase Space',
+                                        xLabel: 'Signal Amplitude',
+                                        yLabel: 'Phase (radians)',
+                                        canvasId: 'quantum-scatter-1'
+                                    })
+                                },
+                                {
+                                    title: "Signal Quality Distribution",
+                                    component: React.createElement(ScatterPlot, {
+                                        data: generatedData,
+                                        xField: 'fidelity',
+                                        yField: 'snr',
+                                        colorField: 'assignedComponent',
+                                        title: 'Fidelity vs Signal-to-Noise Ratio',
+                                        xLabel: 'Quantum State Fidelity',
+                                        yLabel: 'Signal-to-Noise Ratio (dB)',
+                                        canvasId: 'quantum-scatter-2'
+                                    })
+                                },
+                                {
+                                    title: "GMM Component Distribution",
+                                    component: React.createElement(PieChart, {
+                                        data: Object.entries(generatedData.reduce((acc, measurement) => {
+                                            acc[measurement.assignedComponent] = (acc[measurement.assignedComponent] || 0) + 1;
+                                            return acc;
+                                        }, {})).map(([component, count]) => ({ component, count })),
+                                        labelField: 'component',
+                                        valueField: 'count',
+                                        title: 'Quantum Measurement Components',
+                                        canvasId: 'quantum-pie-1'
+                                    })
+                                },
+                                {
+                                    title: "Denoising Performance by Component",
+                                    component: React.createElement(BarChart, {
+                                        data: (() => {
+                                            const componentStats = generatedData.reduce((acc, measurement) => {
+                                                if (!acc[measurement.assignedComponent]) {
+                                                    acc[measurement.assignedComponent] = { 
+                                                        totalQuality: 0, 
+                                                        count: 0,
+                                                        totalError: 0
+                                                    };
+                                                }
+                                                acc[measurement.assignedComponent].totalQuality += measurement.denoisingQuality;
+                                                acc[measurement.assignedComponent].totalError += measurement.reconstructionError;
+                                                acc[measurement.assignedComponent].count++;
+                                                return acc;
+                                            }, {});
+                                            
+                                            return Object.entries(componentStats).map(([component, stats]) => ({
+                                                component,
+                                                avgQuality: Math.round((stats.totalQuality / stats.count) * 100)
+                                            }));
+                                        })(),
+                                        xField: 'component',
+                                        yField: 'avgQuality',
+                                        title: 'Average Denoising Quality by Component (%)',
+                                        xLabel: 'GMM Component',
+                                        yLabel: 'Denoising Quality (%)',
+                                        canvasId: 'quantum-bar-1',
+                                        color: chartUtils.colors.success
+                                    })
+                                },
+                                {
+                                    title: "Coherence Time vs Temperature",
+                                    component: React.createElement(ScatterPlot, {
+                                        data: generatedData,
+                                        xField: 'temperature',
+                                        yField: 'coherenceTime',
+                                        colorField: 'assignedComponent',
+                                        title: 'Quantum Decoherence Analysis',
+                                        xLabel: 'Temperature (K)',
+                                        yLabel: 'Coherence Time (μs)',
+                                        canvasId: 'quantum-scatter-3'
+                                    })
+                                },
+                                {
+                                    title: "Log-Likelihood Distribution",
+                                    component: React.createElement(BarChart, {
+                                        data: (() => {
+                                            const likelihoodRanges = {
+                                                'High (-5 to 0)': 0,
+                                                'Medium (-10 to -5)': 0,
+                                                'Low (-15 to -10)': 0,
+                                                'Very Low (< -15)': 0
+                                            };
+                                            
+                                            generatedData.forEach(measurement => {
+                                                if (measurement.logLikelihood >= -5) likelihoodRanges['High (-5 to 0)']++;
+                                                else if (measurement.logLikelihood >= -10) likelihoodRanges['Medium (-10 to -5)']++;
+                                                else if (measurement.logLikelihood >= -15) likelihoodRanges['Low (-15 to -10)']++;
+                                                else likelihoodRanges['Very Low (< -15)']++;
+                                            });
+                                            
+                                            return Object.entries(likelihoodRanges).map(([range, count]) => ({
+                                                range,
+                                                count
+                                            }));
+                                        })(),
+                                        xField: 'range',
+                                        yField: 'count',
+                                        title: 'GMM Log-Likelihood Distribution',
+                                        xLabel: 'Log-Likelihood Range',
+                                        yLabel: 'Number of Measurements',
+                                        canvasId: 'quantum-bar-2',
+                                        color: chartUtils.colors.purple
+                                    })
+                                },
+                                {
+                                    title: "Detector Efficiency vs Noise Type",
+                                    component: React.createElement(ScatterPlot, {
+                                        data: generatedData,
+                                        xField: 'detectorEfficiency',
+                                        yField: 'noiseLevel',
+                                        colorField: 'detectorType',
+                                        title: 'Detector Performance Analysis',
+                                        xLabel: 'Detector Efficiency',
+                                        yLabel: 'Noise Level',
+                                        canvasId: 'quantum-scatter-4'
                                     })
                                 }
                             ];
